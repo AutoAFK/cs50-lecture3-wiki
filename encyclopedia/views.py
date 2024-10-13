@@ -5,6 +5,7 @@ from markdown2 import markdown
 from . import util
 from . import page
 import os
+import random
 
 def index(request):
     if 'q' in request.GET:
@@ -72,3 +73,10 @@ def edit_page(request,topic):
             "form": page.EditPageForm(topic),
             "topic": topic
         })
+    
+def random_page(request):
+    pages = util.list_entries()
+    random_number = random.randint(0,len(pages))
+    return HttpResponseRedirect(reverse("encyclopedia:topic", kwargs={
+        "topic": pages[random_number - 1]
+    }))

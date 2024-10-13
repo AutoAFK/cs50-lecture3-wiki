@@ -1,7 +1,10 @@
 from django.shortcuts import render
-import markdown2
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+from markdown2 import markdown
 from . import util
-
+from . import page
+import os
 
 def index(request):
     if 'q' in request.GET:
@@ -16,10 +19,39 @@ def index(request):
 
 def topic(request,topic):
     if topic in util.list_entries():
-        html = markdown2.markdown(util.get_entry(topic))
+        html = markdown(util.get_entry(topic))
         return render(request, "encyclopedia/topic.html",{
             "html": html,
             "page_topic": topic
         })
     else:
         return render(request, "encyclopedia/404.html")
+    
+def new_page(request):
+    if request.method == "POST":
+        form = page.NewPageForm(request.POST)
+
+        if form.is_valid():
+            topic = form.cleaned_data["topic"]
+            if topic in util.list_entries():
+                return render(request,"encyclopedia/new_page.html", {
+                    "form": form,
+                    "error" : "Page is already exists."
+                })  
+            content = form.cleaned_data["content"]
+         
+            filename = os.path.join('./entries',f"{topic}.md")
+            with open(filename,'w') as f:
+                f.write(content)
+
+
+            return HttpResponseRedirect(reverse("encyclopedia:topic",kwargs={'topic': topic}))
+        else:
+            return render(request,"encyclopedia/new_page.html", {
+                "form": form
+            })
+
+    else:
+        return render(request,"encyclopedia/new_page.html", {
+            "form": page.NewPageForm()
+        })

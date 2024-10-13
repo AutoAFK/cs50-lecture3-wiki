@@ -4,6 +4,12 @@ from . import util
 
 
 def index(request):
+    if 'q' in request.GET:
+        substring = request.GET.get('q')
+        filtered_list = [item for item in util.list_entries() if substring.lower() in item.lower()]
+        return render(request, "encyclopedia/index.html",{
+            "entries": filtered_list
+        })
     return render(request, "encyclopedia/index.html", {
         "entries": util.list_entries()
     })

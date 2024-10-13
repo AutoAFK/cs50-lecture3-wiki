@@ -9,8 +9,11 @@ def index(request):
     })
 
 def topic(request,topic):
-    html = markdown2.markdown(util.get_entry(topic))
-    return render(request, "encyclopedia/topic.html",{
-        "html": html,
-        "page_topic": topic
-    })
+    if topic in util.list_entries():
+        html = markdown2.markdown(util.get_entry(topic))
+        return render(request, "encyclopedia/topic.html",{
+            "html": html,
+            "page_topic": topic
+        })
+    else:
+        return render(request, "encyclopedia/404.html")

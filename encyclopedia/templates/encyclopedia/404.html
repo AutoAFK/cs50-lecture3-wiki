@@ -1,0 +1,12 @@
+{% extends "encyclopedia/layout.html" %}
+
+{% block title %}
+Page Not Found
+{% endblock %}
+
+{% block body %}
+<h1>404 NOT FOUND</h1>
+The wikipage doesn't exists
+<a href="{%url 'index'%}">Home page</a>
+
+{% endblock %}

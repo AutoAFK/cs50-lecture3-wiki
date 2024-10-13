@@ -39,10 +39,7 @@ def new_page(request):
                     "error" : "Page is already exists."
                 })  
             content = form.cleaned_data["content"]
-         
-            filename = os.path.join('./entries',f"{topic}.md")
-            with open(filename,'w') as f:
-                f.write(content)
+            page.save_data_to_file(topic,content)
 
 
             return HttpResponseRedirect(reverse("encyclopedia:topic",kwargs={'topic': topic}))
@@ -54,4 +51,24 @@ def new_page(request):
     else:
         return render(request,"encyclopedia/new_page.html", {
             "form": page.NewPageForm()
+        })
+    
+def edit_page(request,topic):
+    if request.method == "POST":
+        form = page.EditPageForm(topic,request.POST)
+        if form.is_valid():
+            content = form.cleaned_data['content']
+            page.save_data_to_file(topic,content)
+            return HttpResponseRedirect(reverse('encyclopedia:topic', kwargs={
+                'topic' : topic
+            }))
+        else:
+            return render(request,"encyclopedia/edit_page.html",{
+                "form": page.EditPageForm(topic),
+                "topic": topic,
+            })
+    else: 
+        return render(request,"encyclopedia/edit_page.html",{
+            "form": page.EditPageForm(topic),
+            "topic": topic
         })
